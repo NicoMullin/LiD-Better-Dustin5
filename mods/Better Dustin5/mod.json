@@ -1,0 +1,131 @@
+{
+  "id": "Better Dustin5",
+  "name": "Better Dustin5",
+  "description": "Dustin5 and the Rewards Box made easier: every Dustin5 free with no 5-item limit (or more items for a price you set), no waiting at Dustin5, and in the Rewards Box Triangle sends a present to the Storage Box, L1 sends everything there and R1 takes everything. Set it in Configuration.",
+  "version": "0.1.0",
+  "author": "KSFA",
+  "homepage": "https://github.com/NicoMullin/LiD-Better-Dustin5",
+  "category": "Quality of life",
+  "tags": [
+    "dustin5",
+    "storage",
+    "rewards-box",
+    "death-bag",
+    "game-files"
+  ],
+  "game_version": [
+    "5.0.5.0.0 - 1.92"
+  ],
+  "min_manager_version": "0.13.4",
+  "apply": "diff",
+  "requires": [],
+  "conflicts_with": [],
+  "requires_check_off": [
+    "BrgGame.upk",
+    "SteamPCRelease-BrgUI.ini"
+  ],
+  "plugin": "lid-betterdustin5.dll",
+  "settings": [
+    {
+      "id": "free",
+      "label": "Every Dustin5 is free",
+      "type": "toggle",
+      "default": true,
+      "group": "Sending home",
+      "help": "On: every Dustin5 in the Tower is a free one, as a few already are - nothing to pay, and as many items a send as you like. Off: the paid ones stay paid, at the price below, and take the number of items below."
+    },
+    {
+      "id": "price",
+      "label": "Price of a paid send",
+      "type": "integer",
+      "default": 5000,
+      "min": 1,
+      "max": 200000,
+      "step": 500,
+      "unit": "KC",
+      "group": "Sending home",
+      "when": {"free": false},
+      "help": "The game's own is 5,000 KC. Capped at 200,000 - the highest price this field is ever set to anywhere in the stock game."
+    },
+    {
+      "id": "items",
+      "label": "Items a paid send",
+      "type": "integer",
+      "default": 20,
+      "min": 1,
+      "max": 70,
+      "group": "Sending home",
+      "when": {"free": false},
+      "help": "The game's own is 5. 70 is a whole Death Bag at its biggest (60 with the Bag Size mod, plus the Express Pass's 10). A free Dustin5 has no limit."
+    },
+    {
+      "id": "no_delay",
+      "label": "No waiting at Dustin5",
+      "type": "toggle",
+      "default": true,
+      "help": "The menu opens straight away instead of up to 5 seconds later, and after a send there is no wait while Dustin5 and your fighter play their animations."
+    },
+    {
+      "id": "rewards_box",
+      "label": "Rewards Box: Storage Box and take everything",
+      "type": "toggle",
+      "default": true,
+      "help": "In the Rewards Box: Triangle sends the picked present to the Storage Box, L1 everything that fits there, and R1 takes everything that fits, as taking each one would - each after a Yes/No, and the list's button guide shows all three. Weapons, armour and items go to storage; Kill Coins, decals and the rest go where they always go. No result screen is shown for these. The Storage Box refreshes each time it opens, so what was sent there shows."
+    }
+  ],
+  "patches": [
+    {
+      "type": "raw_sql",
+      "id": "free",
+      "when": {"free": true},
+      "description": "Every Dustin5 is a free one",
+      "sql": "UPDATE master_dustshooter SET type = 'FREE' WHERE type = 'CHARGE';"
+    },
+    {
+      "type": "raw_sql",
+      "id": "price",
+      "when": {"free": false},
+      "description": "A paid send costs {{price:comma}} KC",
+      "sql": "UPDATE master_shop_product_price SET price = {{price}} WHERE id = 'PRD_DUSTSHOOT';"
+    },
+    {
+      "type": "raw_sql",
+      "id": "items",
+      "when": {"free": false},
+      "description": "A paid send takes up to {{items}} items (for lid-betterdustin5.dll)",
+      "sql": "INSERT OR REPLACE INTO master_const_int (id, value) VALUES ('LID_DUSTIN_ITEMS', {{items}});"
+    },
+    {
+      "type": "config_ini",
+      "id": "menu-items",
+      "when": {"free": false},
+      "description": "The Dustin5 menu lets you pick up to {{items}} items",
+      "target": "BrgGame/Config/SteamPCRelease-BrgUI.ini",
+      "section": "BrgGame.BrgUIMenu_DustShooter",
+      "values": {
+        "mCheckMax": "{{items}}"
+      }
+    },
+    {
+      "type": "tfc_installer",
+      "id": "nodelay",
+      "source": "tfc/nodelay",
+      "when": {"no_delay": true},
+      "description": "No waiting at Dustin5 (BrgGame.upk)"
+    },
+    {
+      "type": "raw_sql",
+      "id": "rewardbox-ask",
+      "when": {"rewards_box": true},
+      "description": "Triangle, L1 and R1 ask first, and the Rewards Box guide shows them",
+      "sql": "INSERT INTO master_text (sct, id, snd, lang, txt, type) VALUES ('REWARDBOX', 'TXT_LIDALL_MS', '', 'int', 'Sending everything that fits to the Storage Chest. Are you sure?', 4), ('REWARDBOX', 'TXT_LIDALL_MS', '', 'jpn', '入るものをすべて手荷物預かり所に送ります。よろしいですか？', 4), ('REWARDBOX', 'TXT_LIDALL_MS', '', 'chn', '確定要將放得下的物品全部送到儲藏箱嗎？', 4), ('REWARDBOX', 'TXT_LIDALL_MS', '', 'kan', '确定要将放得下的物品全部送到储藏箱吗？', 4), ('REWARDBOX', 'TXT_LIDALL_MS', '', 'kor', '들어가는 것을 모두 보관함으로 보냅니다. 괜찮습니까?', 4), ('REWARDBOX', 'TXT_LIDALL_MS', '', 'deu', 'Alles, was passt, wird in die Lagerkiste geschickt. Bist du sicher?', 4), ('REWARDBOX', 'TXT_LIDALL_MS', '', 'esn', 'Enviando al cofre todo lo que quepa. ¿Quieres confirmar?', 4), ('REWARDBOX', 'TXT_LIDALL_MS', '', 'fra', 'Envoi au coffre de tout ce qui rentre. Êtes-vous sûr ?', 4), ('REWARDBOX', 'TXT_LIDALL_MS', '', 'ita', 'Vuoi inviare al Riposcrigno tutto ciò che ci sta?', 4), ('REWARDBOX', 'TXT_LIDALL_MS', '', 'ptb', 'Enviando ao baú tudo o que couber. Tem certeza?', 4), ('REWARDBOX', 'TXT_LIDBAG_MS', '', 'int', 'Taking everything that fits. Are you sure?', 4), ('REWARDBOX', 'TXT_LIDBAG_MS', '', 'jpn', '入るものをすべて受け取ります。よろしいですか？', 4), ('REWARDBOX', 'TXT_LIDBAG_MS', '', 'chn', '確定要全部領取放得下的物品嗎？', 4), ('REWARDBOX', 'TXT_LIDBAG_MS', '', 'kan', '确定要全部领取放得下的物品吗？', 4), ('REWARDBOX', 'TXT_LIDBAG_MS', '', 'kor', '들어가는 것을 모두 입수합니다. 괜찮습니까?', 4), ('REWARDBOX', 'TXT_LIDBAG_MS', '', 'deu', 'Alles, was passt, wird genommen. Bist du sicher?', 4), ('REWARDBOX', 'TXT_LIDBAG_MS', '', 'esn', 'Cogiendo todo lo que quepa. ¿Quieres continuar?', 4), ('REWARDBOX', 'TXT_LIDBAG_MS', '', 'fra', 'Prise de tout ce qui rentre. Êtes-vous sûr ?', 4), ('REWARDBOX', 'TXT_LIDBAG_MS', '', 'ita', 'Vuoi raccogliere tutto ciò che ci sta?', 4), ('REWARDBOX', 'TXT_LIDBAG_MS', '', 'ptb', 'Pegando tudo o que couber. Tem certeza?', 4), ('REWARDBOX', 'TXT_LIDALL', '', 'int', 'Store All', 4), ('REWARDBOX', 'TXT_LIDALL', '', 'jpn', 'すべて預ける', 4), ('REWARDBOX', 'TXT_LIDALL', '', 'chn', '全部儲藏', 4), ('REWARDBOX', 'TXT_LIDALL', '', 'kan', '全部储藏', 4), ('REWARDBOX', 'TXT_LIDALL', '', 'kor', '모두 보관한다', 4), ('REWARDBOX', 'TXT_LIDALL', '', 'deu', 'Alles lagern', 4), ('REWARDBOX', 'TXT_LIDALL', '', 'esn', 'Almacenar todo', 4), ('REWARDBOX', 'TXT_LIDALL', '', 'fra', 'Tout entreposer', 4), ('REWARDBOX', 'TXT_LIDALL', '', 'ita', 'Deposita tutto', 4), ('REWARDBOX', 'TXT_LIDALL', '', 'ptb', 'Guardar tudo', 4), ('REWARDBOX', 'TXT_LIDBAG', '', 'int', 'Take All', 4), ('REWARDBOX', 'TXT_LIDBAG', '', 'jpn', 'すべて受け取る', 4), ('REWARDBOX', 'TXT_LIDBAG', '', 'chn', '全部領取', 4), ('REWARDBOX', 'TXT_LIDBAG', '', 'kan', '全部领取', 4), ('REWARDBOX', 'TXT_LIDBAG', '', 'kor', '모두 입수한다', 4), ('REWARDBOX', 'TXT_LIDBAG', '', 'deu', 'Alles nehmen', 4), ('REWARDBOX', 'TXT_LIDBAG', '', 'esn', 'Coger todo', 4), ('REWARDBOX', 'TXT_LIDBAG', '', 'fra', 'Tout prendre', 4), ('REWARDBOX', 'TXT_LIDBAG', '', 'ita', 'Prendi tutto', 4), ('REWARDBOX', 'TXT_LIDBAG', '', 'ptb', 'Pegar tudo', 4);"
+    },
+    {
+      "type": "tfc_installer",
+      "id": "rewardbox",
+      "source": "tfc/rewardbox",
+      "when": {"rewards_box": true},
+      "description": "Rewards Box: Triangle, L1 and R1 (BrgGame.upk)"
+    }
+  ]
+}
