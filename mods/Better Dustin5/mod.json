@@ -2,7 +2,7 @@
   "id": "Better Dustin5",
   "name": "Better Dustin5",
   "description": "Dustin5 and the Rewards Box made easier: every Dustin5 free with no 5-item limit (or more items for a price you set), no waiting at Dustin5, and in the Rewards Box Triangle sends a present to the Storage Box, L1 sends everything there and R1 takes everything. Set it in Configuration.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "KSFA",
   "homepage": "https://github.com/NicoMullin/LiD-Better-Dustin5",
   "category": "Quality of life",
@@ -13,9 +13,7 @@
     "death-bag",
     "game-files"
   ],
-  "game_version": [
-    "5.0.5.0.0 - 1.92"
-  ],
+  "game_version": ["5.0.6.0.0 - 1.93"],
   "min_manager_version": "0.13.4",
   "apply": "diff",
   "requires": [],
